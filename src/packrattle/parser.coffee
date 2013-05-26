@@ -304,11 +304,9 @@ reduce = (p, separator="", accumulator=null, reducer=null, minCount=1, maxCount=
 
 # turn strings, regexen, and arrays into parsers implicitly.
 implicit = (p) ->
-  # wow, javascript's type system completely falls apart here.
   if typeof p == "string" then return string(p)
-  className = p.constructor.toString().split(" ")[1]
-  if className == "RegExp()" then return regex(p)
-  if className == "Array()" then return seq(p...)
+  if p instanceof RegExp then return regex(p)
+  if p instanceof Array then return seq(p...)
   p
 
 # allow functions to be passed in, and resolved only at parse-time.
