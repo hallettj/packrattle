@@ -1,13 +1,7 @@
-
-child_process = require 'child_process'
-fibers = require 'fibers'
-fs = require 'fs'
-glob = require 'glob'
-mocha = require 'mocha'
-sync = require 'sync'
-util = require 'util'
-
 exec = (args...) ->
+  child_process = require 'child_process'
+  fibers = require 'fibers'
+  util = require 'util'
   command = args.shift()
   process = child_process.spawn command, args
   process.stderr.on "data", (data) -> util.print(data.toString())
@@ -24,6 +18,7 @@ run = (command) ->
     process.exit(1)
 
 checkfile = (file1, file2) ->
+  fs = require 'fs'
   data1 = fs.readFileSync(file1, "UTF-8")
   data2 = fs.readFileSync(file2, "UTF-8")
   if data1 != data2
@@ -32,11 +27,13 @@ checkfile = (file1, file2) ->
 
 # run a task inside a sync-capable fiber
 synctask = (name, description, f) ->
+  sync = require 'sync'
   task name, description, -> (sync -> f())
 
 ## -----
 
 synctask "test", "run unit tests", ->
+  mocha = require 'mocha'
   run "./node_modules/mocha/bin/mocha -R Progress --compilers coffee:coffee-script --colors"
 
 synctask "build", "build javascript", ->
